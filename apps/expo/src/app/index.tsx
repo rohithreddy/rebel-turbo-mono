@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button, Pressable, Text, TextInput, View } from "react-native";
+import { Pressable, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Link, Stack } from "expo-router";
 import { LegendList } from "@legendapp/list";
@@ -79,7 +79,7 @@ function CreatePost() {
         </Text>
       )}
       <Pressable
-        className="flex items-center rounded bg-primary p-2"
+        className="flex items-center rounded-lg bg-primary px-6 py-3"
         onPress={() => {
           mutate({
             title,
@@ -87,7 +87,7 @@ function CreatePost() {
           });
         }}
       >
-        <Text className="text-foreground">Create</Text>
+        <Text className="font-semibold text-primary-foreground">Create</Text>
       </Pressable>
       {error?.data?.code === "UNAUTHORIZED" && (
         <Text className="mt-2 text-destructive">
@@ -103,21 +103,38 @@ function MobileAuth() {
 
   return (
     <>
-      <Text className="pb-2 text-center text-xl font-semibold text-zinc-900">
+      <Text className="pb-2 text-center text-xl font-semibold text-foreground">
         {session?.user.name ? `Hello, ${session.user.name}` : "Not logged in"}
       </Text>
-      <Button
-        onPress={() =>
-          session
-            ? authClient.signOut()
-            : authClient.signIn.social({
-                provider: "discord",
-                callbackURL: "/",
-              })
-        }
-        title={session ? "Sign Out" : "Sign In With Discord"}
-        color={"#5B65E9"}
-      />
+      <View className="flex flex-row gap-2">
+        {session ? (
+          <Pressable
+            className="flex items-center rounded-lg bg-primary px-6 py-3"
+            onPress={() => authClient.signOut()}
+          >
+            <Text className="font-semibold text-primary-foreground">
+              Sign Out
+            </Text>
+          </Pressable>
+        ) : (
+          <>
+            <Link asChild href="/login">
+              <Pressable className="flex items-center rounded-lg bg-primary px-6 py-3">
+                <Text className="font-semibold text-primary-foreground">
+                  Sign In
+                </Text>
+              </Pressable>
+            </Link>
+            <Link asChild href="/signup">
+              <Pressable className="flex items-center rounded-lg bg-secondary px-6 py-3">
+                <Text className="font-semibold text-secondary-foreground">
+                  Sign Up
+                </Text>
+              </Pressable>
+            </Link>
+          </>
+        )}
+      </View>
     </>
   );
 }

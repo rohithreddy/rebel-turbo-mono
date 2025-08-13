@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "pnpm with-env:dev next build",
+    "build": "next build",
     "build:dev": "pnpm with-env:dev next build",
     "build:prod": "pnpm with-env:prod next build",
     "clean": "git clean -xdf .cache .next .turbo node_modules",
