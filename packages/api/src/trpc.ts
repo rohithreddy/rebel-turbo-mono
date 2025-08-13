@@ -10,7 +10,7 @@ import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
 import { z, ZodError } from "zod/v4";
 
-import type { Auth } from "@acme/auth";
+import type { Auth, Session } from "@acme/auth";
 import { db } from "@acme/db/client";
 
 /**
@@ -29,11 +29,23 @@ import { db } from "@acme/db/client";
 export const createTRPCContext = async (opts: {
   headers: Headers;
   auth: Auth;
-}) => {
+}): Promise<{
+  authApi: Auth["api"];
+  session: Session | null;
+  db: typeof db;
+}> => {
   const authApi = opts.auth.api;
-  const session = await authApi.getSession({
-    headers: opts.headers,
-  });
+  let session: Session | null = null;
+  
+  try {
+    session = await authApi.getSession({
+      headers: opts.headers,
+    });
+  } catch (error) {
+    // Log the error but don't throw - let the session be null
+    console.warn("Failed to get session:", error);
+  }
+  
   return {
     authApi,
     session,
@@ -71,7 +83,7 @@ const t = initTRPC.context<typeof createTRPCContext>().create({
  * This is how you create new routers and subrouters in your tRPC API
  * @see https://trpc.io/docs/router
  */
-export const createTRPCRouter = t.router;
+export const createTRPCRouter: typeof t.router = t.router;
 
 /**
  * Middleware for timing procedure execution and adding an articifial delay in development.
@@ -103,7 +115,25 @@ const timingMiddleware = t.middleware(async ({ next, path }) => {
  * tRPC API. It does not guarantee that a user querying is authorized, but you
  * can still access user session data if they are logged in
  */
-export const publicProcedure = t.procedure.use(timingMiddleware);
+export const publicProcedure: ReturnType<typeof t.procedure.use> = t.procedure.use(timingMiddleware);
+
+/**
+ * Optional auth procedure
+ *
+ * Similar to public procedure but provides better type safety for session data.
+ * Use this when you want to access session data if available, but don't require authentication.
+ */
+export const optionalAuthProcedure: ReturnType<typeof t.procedure.use> = t.procedure
+  .use(timingMiddleware)
+  .use(({ ctx, next }) => {
+    return next({
+      ctx: {
+        ...ctx,
+        // Session is already properly typed as Session | null from context
+        session: ctx.session,
+      },
+    });
+  });
 
 /**
  * Protected (authenticated) procedure
@@ -113,16 +143,20 @@ export const publicProcedure = t.procedure.use(timingMiddleware);
  *
  * @see https://trpc.io/docs/procedures
  */
-export const protectedProcedure = t.procedure
+export const protectedProcedure: ReturnType<typeof t.procedure.use> = t.procedure
   .use(timingMiddleware)
   .use(({ ctx, next }) => {
     if (!ctx.session?.user) {
-      throw new TRPCError({ code: "UNAUTHORIZED" });
+      throw new TRPCError({ 
+        code: "UNAUTHORIZED",
+        message: "Authentication required. Please sign in to access this resource."
+      });
     }
     return next({
       ctx: {
+        ...ctx,
         // infers the `session` as non-nullable
-        session: { ...ctx.session, user: ctx.session.user },
+        session: ctx.session,
       },
     });
   });

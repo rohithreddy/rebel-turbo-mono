@@ -18,10 +18,15 @@ export const auth = initAuth({
   baseUrl,
   productionUrl: `https://${env.VERCEL_PROJECT_PRODUCTION_URL ?? "turbo.t3.gg"}`,
   secret: env.AUTH_SECRET,
-  discordClientId: env.AUTH_DISCORD_ID,
-  discordClientSecret: env.AUTH_DISCORD_SECRET,
+  dodoPaymentsApiKey: env.DODO_PAYMENTS_API_KEY,
+  dodoPaymentsWebhookSecret: env.DODO_PAYMENTS_WEBHOOK_SECRET,
 });
 
-export const getSession = cache(async () =>
-  auth.api.getSession({ headers: await headers() }),
-);
+export const getSession = cache(async () => {
+  try {
+    return await auth.api.getSession({ headers: await headers() });
+  } catch (error) {
+    console.warn("Failed to get session:", error);
+    return null;
+  }
+});

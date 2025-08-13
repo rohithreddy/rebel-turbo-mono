@@ -1,7 +1,8 @@
 import { Suspense } from "react";
 
 import { HydrateClient, prefetch, trpc } from "~/trpc/server";
-import { AuthShowcase } from "./_components/auth-showcase";
+import { PaymentButtons, SubscriptionStatus } from "./_components/payment-buttons";
+import { OrganizationManagement } from "./_components/organization-management";
 import {
   CreatePostForm,
   PostCardSkeleton,
@@ -13,26 +14,44 @@ export default function HomePage() {
 
   return (
     <HydrateClient>
-      <main className="container h-screen py-16">
-        <div className="flex flex-col items-center justify-center gap-4">
-          <h1 className="text-5xl font-extrabold tracking-tight sm:text-[5rem]">
-            Create <span className="text-primary">T3</span> Turbo
-          </h1>
-          <AuthShowcase />
+      <main className="container py-8">
+        <div className="space-y-8">
+          <div className="text-center">
+            <h1 className="text-4xl font-bold tracking-tight">
+              Welcome to <span className="text-primary">TurboLearn</span>
+            </h1>
+            <p className="mt-2 text-muted-foreground">
+              A modern learning platform built with the T3 stack
+            </p>
+          </div>
 
-          <CreatePostForm />
-          <div className="w-full max-w-2xl overflow-y-scroll">
-            <Suspense
-              fallback={
-                <div className="flex w-full flex-col gap-4">
-                  <PostCardSkeleton />
-                  <PostCardSkeleton />
-                  <PostCardSkeleton />
-                </div>
-              }
-            >
-              <PostList />
-            </Suspense>
+          <div className="grid gap-8 md:grid-cols-2">
+            <div className="space-y-6">
+              <h2 className="text-2xl font-semibold">Features</h2>
+              <div className="space-y-4">
+                <PaymentButtons />
+                <SubscriptionStatus />
+                <OrganizationManagement />
+              </div>
+            </div>
+
+            <div className="space-y-6">
+              <h2 className="text-2xl font-semibold">Posts</h2>
+              <CreatePostForm />
+              <div className="space-y-4">
+                <Suspense
+                  fallback={
+                    <div className="flex w-full flex-col gap-4">
+                      <PostCardSkeleton />
+                      <PostCardSkeleton />
+                      <PostCardSkeleton />
+                    </div>
+                  }
+                >
+                  <PostList />
+                </Suspense>
+              </div>
+            </div>
           </div>
         </div>
       </main>
