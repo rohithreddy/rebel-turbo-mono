@@ -1,9 +1,21 @@
 import type { BetterAuthOptions } from "better-auth";
 import { expo } from "@better-auth/expo";
+import {
+  checkout,
+  dodopayments,
+  portal,
+  webhooks,
+} from "@dodopayments/better-auth";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { admin, bearer, jwt, oAuthProxy, openAPI, organization } from "better-auth/plugins";
-import { dodopayments, checkout, portal, webhooks } from "@dodopayments/better-auth";
+import {
+  admin,
+  bearer,
+  jwt,
+  oAuthProxy,
+  openAPI,
+  organization,
+} from "better-auth/plugins";
 import DodoPayments from "dodopayments";
 
 import { db } from "@acme/db/client";
@@ -68,7 +80,7 @@ export function initAuth(options: {
             webhookKey: options.dodoPaymentsWebhookSecret,
             // Generic handler for all webhook events
             onPayload: async (payload) => {
-              console.log("Received webhook:", payload.type);
+              console.log("Received webhook:", payload);
             },
             // Payment event handlers
             onPaymentSucceeded: async (payload) => {
