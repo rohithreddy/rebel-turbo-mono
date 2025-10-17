@@ -14,7 +14,7 @@ DB_CONTAINER_NAME="turbolearn-postgres"
 DB_NAME="turbolearn"
 DB_USER="postgres"
 DB_PASSWORD="password"
-DB_PORT="5432"
+DB_PORT="5433"
 
 if ! [ -x "$(command -v docker)" ]; then
   echo -e "Docker is not installed. Please install docker and try again.\nDocker install guide: https://docs.docker.com/engine/install/"
