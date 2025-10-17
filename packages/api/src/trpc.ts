@@ -9,9 +9,11 @@
 import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
 import { z, ZodError } from "zod/v4";
+import { eq } from "drizzle-orm";
 
-import type { Auth, Session } from "@acme/auth";
-import { db } from "@acme/db/client";
+import type { Auth, Session } from "@barebel/auth";
+import { db } from "@barebel/db/client";
+import { users } from "@barebel/db/schema";
 
 /**
  * 1. CONTEXT
@@ -33,10 +35,12 @@ export const createTRPCContext = async (opts: {
   authApi: Auth["api"];
   session: Session | null;
   db: typeof db;
+  profile: typeof users.$inferSelect | null;
 }> => {
   const authApi = opts.auth.api;
   let session: Session | null = null;
-  
+  let profile: typeof users.$inferSelect | null = null;
+
   try {
     session = await authApi.getSession({
       headers: opts.headers,
@@ -45,11 +49,44 @@ export const createTRPCContext = async (opts: {
     // Log the error but don't throw - let the session be null
     console.warn("Failed to get session:", error);
   }
-  
+
+  const sessionUser = session?.user;
+  const sessionUserId =
+    (sessionUser as { id?: string; userId?: string } | undefined)?.id ??
+    (sessionUser as { id?: string; userId?: string } | undefined)?.userId;
+
+  if (sessionUser && sessionUserId) {
+    profile =
+      (await db.query.users.findFirst({
+        where: eq(users.id, sessionUserId),
+      })) ?? null;
+
+    if (!profile) {
+      const fallbackName =
+        (sessionUser as { name?: string; email?: string }).name ??
+        (sessionUser as { email?: string }).email ??
+        "User";
+
+      await db.insert(users).values({
+        id: sessionUserId,
+        name: fallbackName,
+        email: (sessionUser as { email?: string }).email ?? "",
+        image: (sessionUser as { image?: string; avatar?: string }).image ?? null,
+        role: "user",
+      });
+
+      profile =
+        (await db.query.users.findFirst({
+          where: eq(users.id, sessionUserId),
+        })) ?? null;
+    }
+  }
+
   return {
     authApi,
     session,
     db,
+    profile,
   };
 };
 /**
@@ -94,12 +131,6 @@ export const createTRPCRouter: typeof t.router = t.router;
 const timingMiddleware = t.middleware(async ({ next, path }) => {
   const start = Date.now();
 
-  if (t._config.isDev) {
-    // artificial delay in dev 100-500ms
-    const waitMs = Math.floor(Math.random() * 400) + 100;
-    await new Promise((resolve) => setTimeout(resolve, waitMs));
-  }
-
   const result = await next();
 
   const end = Date.now();
@@ -115,7 +146,9 @@ const timingMiddleware = t.middleware(async ({ next, path }) => {
  * tRPC API. It does not guarantee that a user querying is authorized, but you
  * can still access user session data if they are logged in
  */
-export const publicProcedure: ReturnType<typeof t.procedure.use> = t.procedure.use(timingMiddleware);
+export const publicProcedure: ReturnType<typeof t.procedure.use> = t.procedure.use(
+  timingMiddleware,
+);
 
 /**
  * Optional auth procedure
@@ -146,17 +179,34 @@ export const optionalAuthProcedure: ReturnType<typeof t.procedure.use> = t.proce
 export const protectedProcedure: ReturnType<typeof t.procedure.use> = t.procedure
   .use(timingMiddleware)
   .use(({ ctx, next }) => {
-    if (!ctx.session?.user) {
-      throw new TRPCError({ 
+    if (!ctx.session?.user || !ctx.profile) {
+      throw new TRPCError({
         code: "UNAUTHORIZED",
-        message: "Authentication required. Please sign in to access this resource."
+        message: "Authentication required. Please sign in to access this resource.",
       });
     }
     return next({
       ctx: {
         ...ctx,
-        // infers the `session` as non-nullable
         session: ctx.session,
+        profile: ctx.profile!,
+      } as typeof ctx & {
+        session: NonNullable<typeof ctx.session>;
+        profile: NonNullable<typeof ctx.profile>;
       },
     });
   });
+
+export const adminProcedure: ReturnType<typeof t.procedure.use> = protectedProcedure.use(
+  ({ ctx, next }) => {
+    const profile = ctx.profile!;
+    if (profile.role !== "admin") {
+      throw new TRPCError({
+        code: "FORBIDDEN",
+        message: "You must be an admin to access this resource.",
+      });
+    }
+
+    return next();
+  },
+);

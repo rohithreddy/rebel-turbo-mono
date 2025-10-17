@@ -1,5 +1,5 @@
 {
-  "name": "@acme/tailwind-config",
+  "name": "@barebel/tailwind-config",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -20,13 +20,13 @@
     "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
-    "@acme/eslint-config": "workspace:*",
-    "@acme/prettier-config": "workspace:*",
-    "@acme/tsconfig": "workspace:*",
-    "@types/node": "^22.17.1",
+    "@barebel/eslint-config": "workspace:*",
+    "@barebel/prettier-config": "workspace:*",
+    "@barebel/tsconfig": "workspace:*",
+    "@types/node": "^24.8.1",
     "eslint": "catalog:",
     "prettier": "catalog:",
     "typescript": "catalog:"
   },
-  "prettier": "@acme/prettier-config"
+  "prettier": "@barebel/prettier-config"
 }

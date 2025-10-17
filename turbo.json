@@ -68,8 +68,6 @@
   "globalEnv": [
     "POSTGRES_URL",
     "AUTH_SECRET",
-    "DODO_PAYMENTS_API_KEY",
-    "DODO_PAYMENTS_WEBHOOK_SECRET",
     "PORT"
   ],
   "globalPassThroughEnv": [

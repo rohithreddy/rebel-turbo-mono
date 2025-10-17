@@ -1,3 +1,4 @@
+import path from "path";
 import { createJiti } from "jiti";
 
 const jiti = createJiti(import.meta.url);
@@ -9,16 +10,23 @@ await jiti.import("./src/env");
 const config = {
   /** Enables hot reloading for local packages without a build step */
   transpilePackages: [
-    "@acme/api",
-    "@acme/auth",
-    "@acme/db",
-    "@acme/ui",
-    "@acme/validators",
+    "@barebel/api",
+    "@barebel/auth",
+    "@barebel/db",
+    "@barebel/ui",
+    "@barebel/validators",
   ],
 
   /** We already do linting and typechecking as separate tasks in CI */
   eslint: { ignoreDuringBuilds: true },
   typescript: { ignoreBuildErrors: true },
+  webpack: (config) => {
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      "@": path.resolve(process.cwd(), "src"),
+    };
+    return config;
+  },
 };
 
 export default config;

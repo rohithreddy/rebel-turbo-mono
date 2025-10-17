@@ -115,7 +115,7 @@ pnpm ios
 - **Deployment**: Vercel-optimized (Next.js), EAS Build (Expo)
 
 ### Package Naming Convention
-Uses `@acme` as namespace prefix. Replace with your organization name across the codebase.
+Uses `@barebel` as namespace prefix. Replace with your organization name across the codebase.
 
 ### Environment Setup
 1. Copy `.env.example` to `.env`

@@ -149,14 +149,13 @@ pnpm ios
 - Environment-specific builds (dev/prod) with dotenv-cli
 
 ### Package Naming Convention
-Uses `@acme` as namespace prefix throughout the codebase. Replace with your organization name when adapting.
+Uses `@barebel` as namespace prefix throughout the codebase. Replace with your organization name when adapting.
 
 ### Environment Configuration
 Required environment variables:
 - `POSTGRES_URL` - Supabase/PostgreSQL connection string
 - `AUTH_SECRET` - Generate with `openssl rand -base64 32`
 - `AUTH_DISCORD_ID`, `AUTH_DISCORD_SECRET` - OAuth provider credentials
-- `DODO_PAYMENTS_API_KEY`, `DODO_PAYMENTS_WEBHOOK_SECRET` - Payment integration
 
 Environment files:
 - `.env.development` - Development configuration
@@ -204,7 +203,7 @@ Environment files:
 **Adding UI components:**
 1. Use `pnpm ui-add` for shadcn/ui components
 2. Extend in `packages/ui` for cross-app sharing
-3. Import in apps via `@acme/ui` package reference
+3. Import in apps via `@barebel/ui` package reference
 
 ### Deployment Considerations
 

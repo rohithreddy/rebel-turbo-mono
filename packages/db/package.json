@@ -1,5 +1,5 @@
 {
-  "name": "@acme/db",
+  "name": "@barebel/db",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -40,9 +40,9 @@
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@acme/eslint-config": "workspace:*",
-    "@acme/prettier-config": "workspace:*",
-    "@acme/tsconfig": "workspace:*",
+    "@barebel/eslint-config": "workspace:*",
+    "@barebel/prettier-config": "workspace:*",
+    "@barebel/tsconfig": "workspace:*",
     "@types/pg": "^8.11.10",
     "dotenv-cli": "^10.0.0",
     "drizzle-kit": "^0.31.4",
@@ -50,5 +50,5 @@
     "prettier": "catalog:",
     "typescript": "catalog:"
   },
-  "prettier": "@acme/prettier-config"
+  "prettier": "@barebel/prettier-config"
 }

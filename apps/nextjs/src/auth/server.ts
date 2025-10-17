@@ -3,7 +3,7 @@ import "server-only";
 import { cache } from "react";
 import { headers } from "next/headers";
 
-import { initAuth } from "@acme/auth";
+import { initAuth } from "@barebel/auth";
 
 import { env } from "~/env";
 
@@ -18,8 +18,6 @@ export const auth = initAuth({
   baseUrl,
   productionUrl: `https://${env.VERCEL_PROJECT_PRODUCTION_URL ?? "turbo.t3.gg"}`,
   secret: env.AUTH_SECRET,
-  dodoPaymentsApiKey: env.DODO_PAYMENTS_API_KEY,
-  dodoPaymentsWebhookSecret: env.DODO_PAYMENTS_WEBHOOK_SECRET,
 });
 
 export const getSession = cache(async () => {

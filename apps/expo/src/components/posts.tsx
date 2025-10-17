@@ -6,8 +6,8 @@ import {
   useQuery,
 } from "@tanstack/react-query";
 
-import type { RouterOutputs } from "@acme/api";
-import { CreatePostSchema } from "@acme/db/schema";
+import type { RouterOutputs } from "@barebel/api";
+import { CreatePostSchema } from "@barebel/db/schema";
 
 import { trpc } from "~/utils/api";
 

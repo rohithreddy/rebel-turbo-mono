@@ -4,8 +4,6 @@ import { z } from "zod/v4";
 export function authEnv() {
   return createEnv({
     server: {
-      DODO_PAYMENTS_API_KEY: z.string().min(1),
-      DODO_PAYMENTS_WEBHOOK_SECRET: z.string().min(1),
       AUTH_SECRET:
         process.env.NODE_ENV === "production"
           ? z.string().min(1)

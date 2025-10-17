@@ -7,16 +7,16 @@ import { createTRPCContext } from "./trpc";
 /**
  * Inference helpers for input types
  * @example
- * type PostByIdInput = RouterInputs['post']['byId']
- *      ^? { id: number }
+ * type CampaignListInput = RouterInputs['campaigns']['getAll']
+ *      ^? { category?: string | undefined; ... }
  **/
 type RouterInputs = inferRouterInputs<AppRouter>;
 
 /**
  * Inference helpers for output types
  * @example
- * type AllPostsOutput = RouterOutputs['post']['all']
- *      ^? Post[]
+ * type CampaignListOutput = RouterOutputs['campaigns']['getAll']
+ *      ^? { items: Campaign[]; nextCursor: number | null }
  **/
 type RouterOutputs = inferRouterOutputs<AppRouter>;
 
