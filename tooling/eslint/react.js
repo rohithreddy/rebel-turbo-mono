@@ -1,9 +1,22 @@
 import reactPlugin from "eslint-plugin-react";
-import * as reactHooks from "eslint-plugin-react-hooks";
+import reactHooksPlugin from "eslint-plugin-react-hooks";
+
+const reactHooksConfig =
+  reactHooksPlugin?.configs?.flat?.recommended ??
+  reactHooksPlugin?.configs?.flat?.["recommended-latest"] ??
+  reactHooksPlugin?.configs?.recommended ??
+  reactHooksPlugin?.default?.configs?.flat?.recommended ??
+  reactHooksPlugin?.default?.configs?.flat?.["recommended-latest"] ??
+  reactHooksPlugin?.default?.configs?.recommended ??
+  {};
+
+const hasReactCompilerRule =
+  reactHooksPlugin?.rules?.["react-compiler"] ??
+  reactHooksPlugin?.default?.rules?.["react-compiler"];
 
 /** @type {Awaited<import('typescript-eslint').Config>} */
 export default [
-  reactHooks.configs.recommended,
+  reactHooksConfig,
   {
     files: ["**/*.ts", "**/*.tsx"],
     plugins: {
@@ -11,7 +24,11 @@ export default [
     },
     rules: {
       ...reactPlugin.configs["jsx-runtime"].rules,
-      "react-hooks/react-compiler": "error",
+      ...(hasReactCompilerRule
+        ? {
+            "react-hooks/react-compiler": "error",
+          }
+        : {}),
     },
     languageOptions: {
       globals: {
