@@ -9,6 +9,10 @@
       "dependsOn": ["^build"],
       "outputs": [".cache/tsbuildinfo.json", "dist/**"]
     },
+    "build:dev": {
+      "dependsOn": ["^build:dev"],
+      "outputs": [".cache/tsbuildinfo.json", "dist/**"]
+    },
     "build:prod": {
       "dependsOn": ["^build:prod"],
       "outputs": [".cache/tsbuildinfo.json", "dist/**"]
